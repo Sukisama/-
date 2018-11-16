@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <script type="text/javascript">
+        function partRefresh() {
+            document.getElementById("iframe1Id").src = "#"; // 方法一: 通过和替换iframe的src来实现局部刷新
+        }
+    </script>
+</head>
+
+<body>
+    <table border="1" width="90%" align="center">
+        <tr style="background: #F0F0E4">
+            <td>方格1</td>
+            <td>方格2</td>
+            <td>方格3</td>
+        </tr>
+        <tr>
+            <td>
+                <iframe src="#" id="iframe1Id" name="iframe1Name" width="100%"></iframe>
+            </td>
+            <td>
+                <iframe src="#" id="iframe2Id" name="iframe2Name" width="100%"></iframe>
+            </td>
+            <td>
+                <iframe src="#" id="iframe3Id" name="iframe3Name" width="100%"></iframe>
+            </td>
+        </tr>
+    </table>
+    <br>
+    <br>
+    <input type="button" value="IFRAME局部刷新" style="margin-left: 70px;"="partRefresh();">
+</body>
+
+</html>

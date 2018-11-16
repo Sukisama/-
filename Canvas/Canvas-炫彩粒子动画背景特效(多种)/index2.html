@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>canvas粒子动画2</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      background: url('http://screen.cditv.cn:8080/Public/Statics/cpcca/images/page_bg1.jpg');
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="c"></canvas>
+  <script>
+
+    var a = document.getElementById('c');
+    var c = a.getContext('2d');
+    a.width = window.innerWidth;
+    a.height = window.innerHeight;
+
+    var counts = [],
+      maxCount = 30,
+      entityCount = 10,
+      avoidThresh = 50;
+
+    //循环放入 规定个元素
+    for (var i = 0; i < maxCount; i++) {
+      counts.push(new Ball());
+    }
+
+    //随机数函数
+    function rand(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function Particle() {
+
+      this.x = a.width * Math.random();
+      this.y = a.height * Math.random();
+      this.ax = 0;
+      this.ay = 0;
+      this.vx = 0;
+      this.vy = 0;
+    }
+
+    Particle.prototype.step = function () {
+      this.x += this.vx;
+      this.y += this.vy;
+      // 边界处理
+      if (this.x >= a.width || this.x <= 0) { this.vx = 0; this.ax = 0; }
+      if (this.y >= a.height || this.y <= 0) { this.vy = 0; this.ay = 0; }
+      if (this.x >= a.width) { this.x = a.width; }
+      if (this.x <= 0) { this.x = 0; }
+      if (this.y >= a.height) { this.y = a.height; }
+      if (this.y <= 0) { this.y = 0; }
+
+      this.ax += rand(-0.4, 0.4);
+      this.ay += rand(-0.4, 0.4);
+      this.vx += this.ax;
+      this.vy += this.ay;
+      this.ax *= Math.abs(this.ax) > 2 ? 0.75 : 1;
+      this.ay *= Math.abs(this.ay) > 2 ? 0.75 : 1;
+      this.vx *= Math.abs(this.vx) > 1 ? 0.75 : 1;
+      this.vy *= Math.abs(this.vy) > 1 ? 0.75 : 1;
+    };
+
+    function Ball() {
+      this.branches = [];
+      this.particle = new Particle();
+      this.branches.push(new Branch({
+        count: this,
+        attractor: this.particle
+      }));
+    }
+
+    Ball.prototype.step = function () {
+      this.particle.step();
+      this.branches.forEach(function (branch, i) {
+        branch.step();
+      });
+
+      this.branches.forEach(function (branch, i) {
+        branch.draw();
+      });
+    };
+
+    //创建一个元素方法
+    function Branch(opt) {
+      this.entities = [];
+      this.count = opt.count;
+      //颜色
+      var random = Math.random();
+      var color1 = [216, 0, 44, 1];
+      var color2 = [125, 255, 242, 1];
+      this.color = random >= .5 ? color1 : this.color;
+      this.color = random < .5 ? color2 : this.color;
+      //新元素
+      var entity;
+      for (var i = 0; i < entityCount; i++) {
+        entity = new Entity({
+          branch: this,
+          i: i,
+          x: a.width * Math.random(),
+          y: a.height * Math.random(),
+          radius: 1 + (entityCount - i) / entityCount * 5,
+          damp: 0.2,
+          color: this.color,
+          attractor: i === 0 ? opt.attractor : this.entities[i - 1]
+        });
+        this.entities.push(entity);
+      }
+    }
+
+    Branch.prototype.step = function () {
+      var i = counts.length;
+      while (i--) {
+        var particle = this.count.particle,
+          oParticle = counts[i].particle,
+          dx = oParticle.x - particle.x,
+          dy = oParticle.y - particle.y,
+          dist = Math.sqrt(dx * dx + dy * dy);
+        if (!0 && particle !== oParticle && dist < avoidThresh) {
+          particle.ax = 0;
+          particle.ay = 0;
+          particle.vx -= dx * 0.1;
+          particle.vy -= dy * 0.1;
+        }
+      }
+
+      this.entities.forEach(function (entity, i) {
+        entity.step();
+      });
+
+
+    };
+
+    Branch.prototype.draw = function () {
+
+      this.entities.forEach(function (entity, i) {
+        c.save();
+        c.translate(entity.x, entity.y);
+
+        c.rotate(entity.rot);
+        // c.fillStyle = entity.color;
+        c.fillStyle = 'rgba(' + entity.color[0] + ',' + entity.color[1] + ', ' + entity.color[2] + ', ' + (((entityCount - i) / entityCount)) + ')';
+
+        c.fillRect(0, 0, 10, 10);
+        c.restore();
+      });
+
+    };
+
+    //拖尾
+    function Entity(opt) {
+      this.branch = opt.branch;
+      this.i = opt.i;
+      this.x = opt.x;
+      this.y = opt.y;
+      this.vx = 0;
+      this.vy = 0;
+      this.radius = opt.radius;
+      this.attractor = opt.attractor;
+      this.color = opt.color;
+      this.damp = opt.damp;
+    }
+
+    Entity.prototype.step = function () {
+      this.vx = (this.attractor.x - this.x) * this.damp;
+      this.vy = (this.attractor.y - this.y) * this.damp;
+      this.x += this.vx;
+      this.y += this.vy;
+      this.av = (Math.abs(this.vx) + Math.abs(this.vy)) / 2;
+
+      var dx = this.attractor.x - this.x,
+        dy = this.attractor.y - this.y;
+      this.rot = Math.atan2(dy, dx);
+
+    };
+
+    function loop() {
+      requestAnimationFrame(loop);
+
+      c.globalCompositeOperation = 'destination-out';
+      c.fillRect(0, 0, a.width, a.height);
+      c.globalCompositeOperation = 'lighter';
+
+      counts.forEach(function (count, i) {
+        count.step();
+      });
+
+    }
+    
+    loop();
+  </script>
+
+</body>
+
+</html>

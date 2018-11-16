@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>audio.js</title>
+    <script src="./audiojs/audio.min.js"></script>
+    <!--<link rel="stylesheet" href="./includes/index.css" media="screen">-->
+    <script>
+      audiojs.events.ready(function() {
+        audiojs.createAll();
+      });
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>audio.js</h1>
+    </header>
+
+    <audio src="jq22com.mp3" preload="auto"></audio>
+    
+    
+
+    <h1>audiojs.create(element, settings)</h1>
+    <p>preload="none"</p>
+    <audio src="jq22com.mp3" preload="none"></audio>
+
+</html>

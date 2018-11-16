@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+
+<head>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <title>六位input输入框的短信验证码(PC) </title>
+  <script src="https://g.omtech.cn/bootstrap/v4.1.3/js/bootstrap.js"></script>
+  <link href="https://g.omtech.cn/bootstrap/v4.1.3/css/bootstrap.css" rel="stylesheet">
+  <style>
+    /*弹框验证码*/
+    .ipt-fake-box {
+      text-align: center;
+    }
+
+    .input {
+      display: inline-block;
+    }
+
+    .input:last-child {
+      border-right: 1px solid #999;
+    }
+
+    input.my_input {
+      border-top: 1px solid #999;
+      border-bottom: 1px solid #999;
+      border-left: 1px solid #999;
+      width: 45px;
+      height: 45px;
+      outline: none;
+      font-family: inherit;
+      font-size: 28px;
+      font-weight: inherit;
+      text-align: center;
+      line-height: 45px;
+      color: #c2c2c2;
+      background: rgba(255, 255, 255, 0);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="openModel">点击打开弹框并触发发送短信验证码接口</div>
+  <div class="modal fade" id="applyPhone" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header settingHeader"> <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> ×</button> <h4 class="modal-title" id="myModalLabel">
+          请输入短信验证码 </h4>
+        </div>
+        <div class="modal-body settingBody">
+          <div class="ipt-box-nick mb15-nick">
+            <div class="ipts-box-nick">
+              <div class="ipt-fake-box"> 
+                <input type="tel" class="my_input" maxlength="1" id="firstInput"> 
+                <input type="tel" class="my_input" maxlength="1" id="firstInput1"> 
+                <input type="tel" class="my_input" maxlength="1" id="firstInput2"> 
+                <input type="tel" class="my_input" maxlength="1" id="firstInput3"> 
+                <input type="tel" class="my_input" maxlength="1" id="firstInput4"> 
+                <input type="tel" class="my_input" maxlength="1" id="firstInput5"> </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer settingFooter" id="myfooters">
+          <div id="btnSendCode">
+            <div>验证码错误 <span id="againSend">重新发送</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    $('#openModel').on('click', function () {
+      //打开弹框
+      $('#applyPhone').modal();
+
+      var active = 0;
+      var inputBtn = document.querySelectorAll('.my_input');
+      for (var i = 0; i < inputBtn.length; i++) {
+        inputBtn[i].addEventListener('click', function () {
+          console.log('active==', active);
+          inputBtn[active].focus();
+        }, false);
+        inputBtn[i].addEventListener('focus', function () {
+          console.log(this);
+          this.addEventListener('keyup', listenKeyUp, false);
+        }, false);
+        inputBtn[i].addEventListener('blur', function () {
+          this.removeEventListener('keyup', listenKeyUp, false);
+        }, false);
+      }
+      /**
+       * 监听键盘的敲击事件
+       */
+      function listenKeyUp() {
+        if (/^[0-9]*$/g.test(this.value)) {
+          if (!isNaN(this.value) && this.value.length != 0) {
+            if (active < 5) {
+              active += 1;
+            }
+            inputBtn[active].focus();
+          } else if (this.value.length == 0) {
+            if (active > 0) {
+              active -= 1;
+            }
+            inputBtn[active].focus();
+          }
+          if (active >= 5) {
+            //执行其他操作  获取6个输入的值
+            var codeSix = $('#firstInput').val() + $('#firstInput1').val() + $('#firstInput2').val() + $('#firstInput3').val() + $('#firstInput4').val() + $('#firstInput5').val();
+            console.log('输入完整，执行操作');
+
+            if (codeSix && codeSix.length == '6') {
+              //输入6个数值了，执行输入完成的动作，这里比方说输入完成要做一个验证码的验证
+              var params = {
+                需要传给后台的参数
+              };
+              $.ajax({
+                type: "post",
+                url: 验证验证码是否正确的接口地址,
+                contentType: 'application/json',
+                data: JSON.stringify(params),
+                xhrFields: {
+                  withCredentials: true
+                },
+                crossDomain: true,
+                async: true,
+                dataType: "json",
+                //接口成功回调
+                success: function (data) {
+                  if (data['state'] == 200 || data['State'] == 200) {
+                    //如果输入的验证码和手机短信的验证码一致，则隐藏弹框，并执行验证通过后的回调
+                    $('#applyPhone').modal('hide');
+                    allSuccess();//成功后的回调，这里换成你自己的操作
+                  } else {
+                    //讲input下方的提示语改成接口返回的错误信息，并让用户重新发送验证码
+                    var strs = ['<div>' + data['Msg'] + '   <span id="againSend">重新发送</span></div>'].join("");
+                    $('#btnSendCode').html(strs);
+                    window.clearInterval(InterValObj);//直接清除定时器
+                    //input框全部清除，并将第一个框定位焦点
+                    $('#firstInput').val('');
+                    $('#firstInput1').val('');
+                    $('#firstInput2').val('');
+                    $('#firstInput3').val('');
+                    $('#firstInput4').val('');
+                    $('#firstInput5').val('');
+                    active = 0;
+                    $('#firstInput').focus();
+                    //点击再次发送按钮，重新调取发送验证码接口
+                    $('#againSend').bind('click', function () {
+                      getPhoneCode();
+                      active = 0;
+                      $('#firstInput').focus();
+                    });
+                  }
+                },
+                error: function (data) {
+                  console.log(data);
+                }
+              });
+            }
+          }
+        } else {
+          this.value = '';
+        }
+      }
+      //触发验证码获取接口
+      getPhoneCode();
+      //获取验证码
+      function getPhoneCode() {
+        window.clearInterval(InterValObj);//停止计时器
+        //验证码倒计时
+        var count = 60; //间隔函数，1秒执行
+        var curCount = count;
+        $("#btnSendCode").html('短信验证码已发送至+' + 此处填写需要发送验证码的手机号 + ",请在" + curCount + "秒后可重新发送");
+        InterValObj = window.setInterval(SetRemainTime, 1000); //启动计时器，1秒执行一次
+        //timer处理函数
+        function SetRemainTime() {
+          if (curCount == 0) {
+            window.clearInterval(InterValObj);//停止计时器
+            $("#btnSendCode").removeAttr("disabled");//启用按钮
+            $("#btnSendCode").html("重新发送验证码");
+            active = 0;
+            $('#btnSendCode').bind('click', function () {
+              getPhoneCode();
+              active = 0;
+              $('#firstInput').focus();
+            });
+          }
+          else {
+            curCount--;
+            $("#btnSendCode").html('短信验证码已发送至+' + 此处填写需要发送验证码的手机号 + ",请在" + curCount + "秒后可重新发送");
+          }
+        }
+
+        var url = 此处填写获取手机验证码的url;
+        var param = {
+          此处是获取手机验证码的参数
+        };
+        //用ajax获取验证码
+        $.ajax({
+          type: "post",
+          url: url,
+          cache: false,
+          processData: false,
+          contentType: 'application/x-www-form-urlencoded;charset=utf-8',
+          data: $.param(param),
+          xhrFields: {
+            withCredentials: true
+          },
+          crossDomain: true,
+          async: true,
+          success: function (data) {
+            if (data['State'] == '200') {
+              //发送验证码成功回调
+              $('#firstInput').focus();
+            }
+          },
+          error: function (data) {
+            console.log(data);
+          }
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>

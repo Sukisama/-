@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>文档标题</title>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+</head>
+<style type="text/css">
+.container {
+    position: absolute;
+    top: 30px;
+    padding: 10px;
+    text-align: center;
+}
+.container p{
+    font-family: "微软雅黑";
+    color: #888;
+}
+.val-box {
+    display: inline-block;
+    height: 40px;
+    width: 216px;
+    text-align: center;
+    position: relative;
+    background: #FFFFFF;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.val-box input[type=text] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 34px;
+    width: 212px;
+    font-size: 1.5em;
+    opacity: 0.9;
+    z-index: -999;
+    outline: none;
+    /* margin-left: 1000px; */
+    -webkit-tap-highlight-color: transparent;
+}
+
+.val-box div {
+    height: 38px;
+    width: 20%;
+    border: 1px solid #DDD;
+    border-radius: 5px;
+    float: left;
+    margin: 2px 3px;
+    z-index: 5;
+    font-size: 1.5em;
+    font-family: arial;
+    /*font-weight: 530;*/
+    text-align: center;
+    line-height: 1.5em;
+    cursor: text;
+    /*padding-bottom: 10px;*/
+}
+.val-box .available {
+    border-color: #0081db;
+}
+
+.val-box .availabla:after {
+    /*伪类实现光标效果*/
+    content: ' ';
+    display: inline-block;
+    height: 90%;
+    width: 1px;
+    background: #313131;
+    animation: .8s animate infinite;
+}
+
+</style>
+
+<body> 
+  <div id="shoujihao">
+    <span></span>
+    <button class="daojishibtn" type="button">点击获取</button>
+    <!--验证码输入框-->
+    <div class="container" id="test">
+      <div class="val-box" id="val-box">
+        <input id="val-code-input" type="text" maxlength="4" onkeyup="checkForNum(this)" onselectstart="return false;" onblur="checkForNum(this)"
+        />
+        <div name="val-item"></div>
+        <div name="val-item"></div>
+        <div name="val-item"></div>
+        <div name="val-item"></div>
+      </div>
+    </div>
+  
+  </div>
+  <script>
+  //            四格验证码
+    $(function () {
+      var valCodeInput = $("#val-code-input");
+      var valCodeItems = $("div[name='val-item']");
+      var regex = /^[\w]+$/;
+      var valCodeLength = 0;
+      $('#val-box').on('click', function () {
+        valCodeInput.focus();
+      })
+      //              input输入框即时反映
+      valCodeInput.on('input propertychange change', function (e) {
+        valCodeLength = valCodeInput.val().length;
+        if (valCodeInput.val() && regex.test(valCodeInput.val())) {
+          $(valCodeItems[valCodeLength - 1]).removeClass('available');
+          $(valCodeItems[valCodeLength - 1]).addClass('available');
+          $(valCodeItems[valCodeLength - 1]).text(valCodeInput.val().substring(valCodeLength - 1, valCodeLength));
+        }
+      })
+      //              点击获取验证码或点击第一个数字输入框时获取焦点,添加available类样式
+      $(".daojishibtn,div[name='val-item']").on("tap", function () {
+        $(valCodeInput).focus();
+        $(valCodeItems[0]).addClass('available');
+      })
+      //              删除键
+      $(this).on('keyup', function (e) {
+        if (e.keyCode === 8) {
+          $(valCodeItems[valCodeLength]).text("");
+          if (valCodeLength !== 0) {
+            $(valCodeItems[valCodeLength]).removeClass('available');
+          }
+        }
+      });
+      //              当验证码输入四位时直接跳转（在此验证验证码是否正确）
+      $(valCodeInput).on("input propertychange", function () {
+        if (valCodeInput.val().length == 4) {
+          $("#yanzhengma").fadeOut(200, function () {
+            //资料弹窗弹出
+            $("#dialog1").fadeIn(200);
+          })
+        }
+      })
+    })
+    //            把所有输入的不是数字的字符转换为空值
+    function checkForNum(obj) {
+      obj.value = obj.value.replace(/[\W]/g, '');
+    }
+    </script>
+
+</html>

@@ -1,0 +1,50 @@
+入门
+
+1.电脑：可以运行 Windows, Mac OS X, 或 Linux 系统。
+2.文本编辑器：Atom,Visual Studio Code, TextMate, 有在 Mac OS, Windows 的免费版本，还有 Sublime, WebStorm。
+3.翻墙代理
+
+
+初级
+
+1.Codeacademy: interactive, code-along tutorials (this site is the bomb btw)
+2.Web Development for Beginners: article from webplatform.org.
+3.MDN：https://developer.mozilla.org/en-US/docs/Web
+
+
+中级
+
+1、Command line：熟悉配置环境 shell脚本
+2、CSS的预处理：Sass, LESS。
+3、搭建build系统：
+	Gulp或Grunt这类的构建任务脚本器,编译LESS成 CSS, concatenating Java, minify 压缩静态资源, 
+	选一个异步或同步的方式加载，然后一个好的build系统要能自动做到那些,包括一个本地的web服务器用于测试代码。
+4、代码版本管理：git
+5、部署网站上线。免费服务提供商：heroku.com, https://pages.github.com
+
+
+高级
+
+1.内容管理系统(CMS)：（免费）WordPress，phpCMS
+2.后端语言：Node.js 或 PHP，数据库：MySql 或者MongoDB。
+3.熟悉框架：比如Angular, React, Ember, Vue。
+4.JS design patterns，JS设计模式
+
+
+其他技能
+
+1.扩展人脉：stackoverflow.com
+2.博客：meetup.com
+3.Gitgub：贡献Pull request。
+4.优化搜索
+5.CSS过度效果
+6.性能：减少DOM的reflow和repaint操作，防止滚动性能瓶颈，优化JS, 读一读google web developer fundamentals。
+7.测试框架：实现JS单元测试，比如Jasmine，QUnit。
+8.持续集成Continuous integration (CI)：配置自动测试和部署的工具，比如CircleCI, Travis CI, Jenkins。
+9.动画：CSS3, SVG, Canvas API
+10.后端开发：Node.js
+11.搭建小网站，公开gitub代码库，一份README
+12.去meetup.com 找你的老板或者投资人
+13.申请一个linkedin帐号
+14.时常转转：CSS Tricks，SitePoint，Smashing Magazine
+

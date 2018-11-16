@@ -1,0 +1,137 @@
+﻿<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Canvas粒子动画</title>
+
+  <script src="js/jquery.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      background: url('http://screen.cditv.cn:8080/Public/Statics/cpcca/images/page_bg1.jpg');
+    }
+
+  </style>
+</head>
+
+<body>
+  <!-- <canvas id="c"></canvas> -->
+  <script> 
+
+    var a = document.createElement('canvas');
+    var c = a.getContext('2d');
+        a.width = $(window).width();
+        a.height = $(window).height();
+        $('body').append(a);
+        $('canvas').css({
+          'display': 'block',
+          'position': 'absolute',
+          'left': 0,
+          'top': 0,
+          'width': '100%',
+          'height': '100%',
+          'opacity': 0.1
+        });
+
+    var maxCount = 30;
+    var particles = [];
+    function randomBetween (m, n) {
+      return Math.random() * (m - n) + n;
+    }
+    function Particle(c, progress) {
+
+      var random = randomBetween(0.1,1);
+      this.progress = 0;
+      this.c = c;
+
+      this.x = $(window).width() / 2 + (randomBetween(0.1, 1) * 1200 - randomBetween(0.1, 1) * 1200);
+      this.y = $(window).height() / 2 + (randomBetween(0.1, 1) * 700 - randomBetween(0.1, 1) * 700);
+
+      this.w = $(window).width();
+      this.h = $(window).height();
+      this.radius = 8;
+      this.color = random >= .5 ? "#d8002c" : this.color;
+      this.color = random < .5 ? "#7dfff2" : this.color;
+
+      this.variantx1 = randomBetween(0.2, 0.8) * 300;
+      this.varianty1 = randomBetween(0.2, 0.8) * 200;
+    }
+
+    Particle.prototype.render = function () {
+      this.c.beginPath();
+      this.c.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+      this.c.lineWidth = 2;
+      this.c.fillStyle = this.color;
+      this.c.fill();
+      this.c.closePath();
+    };
+
+    Particle.prototype.move = function () {
+      var xMove = Math.sin(this.progress / this.variantx1),
+        yMove = Math.sin(this.progress / this.varianty1);
+
+      if (xMove < 0.75 && xMove > -0.75) {
+        if (yMove < 0.75 && yMove > -0.75) {
+          xMove = 2 * xMove;
+          this.x += xMove;
+          this.y = this.y;
+        } else {
+          yMove = 2 * yMove;
+          this.y += yMove;
+          this.x = this.x;
+        }
+      } else {
+        if (yMove < 0.75 && yMove > -0.75) {
+          this.y -= 2 * yMove;
+          this.x = this.x;
+        } else {
+          this.x -= 2 * xMove;
+          this.y = this.y;
+        }
+      }
+
+      if (this.x >= a.width || this.x <= 0) { this.xMove = 0; }
+      if (this.y >= a.height || this.y <= 0) { this.yMove = 0; }
+      if (this.x >= a.width) { this.x = a.width; }
+      if (this.x <= 0) { this.x = 0; }
+      if (this.y >= a.height) { this.y = a.height; }
+      if (this.y <= 0) { this.y = 0; }
+      this.render();
+      this.progress++;
+      return true;
+    };
+
+    function Ball(num) {
+      for (var i = 0; i < num; i++) {
+        particles.push(new Particle(c, i));
+      }
+      return particles.length;
+    }
+
+    function loop() {
+      requestAnimationFrame(loop);
+      
+      c.globalAlpha = 0.1;
+      c.fillStyle = 'rgba(0,0,0,0.5)';
+      c.fillRect(0, 0, a.width, a.height);
+      c.globalAlpha = 1;
+
+      particles = particles.filter(function (p) {
+        return p.move();
+      });
+    }
+
+    Ball(maxCount);
+
+    loop();
+  </script>
+
+</body>
+
+</html>

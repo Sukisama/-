@@ -1,0 +1,120 @@
+图片缩放
+function touchScale (seletor, bg) {
+    var startX, endX, scale, x1, x2, y1, y2, imgLeft, imgTop, imgWidth, imgHeight,
+        one = false,
+        $touch = $(seletor),
+        originalWidth = $touch.width(),
+        originalHeight = $touch.height(),
+        baseScale = parseFloat(originalWidth / originalHeight),
+        imgData = [],
+        bgTop = parseInt($(bg).css('top'));
+    function siteData(name) {
+        imgLeft = parseInt(name.css('left'));
+        imgTop = parseInt(name.css('top'));
+        imgWidth = name.width();
+        imgHeight = name.height();
+    }
+    $('.page-show .slide img').on('touchstart touchmove touchend', $(seletor).parent().selector, function (event) {
+        console.log(1);
+        var $me = $(seletor),
+            touch1 = event.originalEvent.targetTouches[0],  // 第一根手指touch事件
+            touch2 = event.originalEvent.targetTouches[1],  // 第二根手指touch事件
+            fingers = event.originalEvent.touches.length;   // 屏幕上手指数量
+        //手指放到屏幕上的时候，还没有进行其他操作
+        if (event.type == 'touchstart') {
+            if (fingers == 2) {
+                // 缩放图片的时候X坐标起始值
+                startX = Math.abs(touch1.pageX - touch2.pageX);
+                one = false;
+            }
+            else if (fingers == 1) {
+                x1 = touch1.pageX;
+                y1 = touch1.pageY;
+                one = true;
+            }
+            siteData($me);
+        }
+        //手指在屏幕上滑动
+        else if (event.type == 'touchmove') {
+            if (fingers == 2) {
+                // 缩放图片的时候X坐标滑动变化值
+                endX = Math.abs(touch1.pageX - touch2.pageX);
+                scale = endX - startX;
+                $me.css({
+                    'width': originalWidth + scale,
+                    'height': (originalWidth + scale) / baseScale,
+                    'left': imgLeft,
+                    'top': imgTop
+                });
+
+            } else if (fingers == 1) {
+                x2 = touch1.pageX;
+                y2 = touch1.pageY;
+                if (one) {
+                    $me.css({
+                        'left': imgLeft + (x2 - x1),
+                        'top': imgTop + (y2 - y1)
+                    });
+                }
+            }
+        }
+        //手指移开屏幕
+        else if (event.type == 'touchend') {
+            // 手指移开后保存图片的宽
+            originalWidth = $touch.width();
+            siteData($me);
+            imgData = [[imgLeft, imgTop - bgTop, imgWidth, imgHeight], [0, 0, 640, 640]];
+        }
+    });
+    var getData = function () {
+        return imgData;
+    };
+    return {
+        imgData: getData
+    };
+}
+
+
+
+
+
+
+
+
+
+
+
+第二种：
+        document.addEventListener('DOMContentLoaded', function () {
+            var c = 1;//先定义一个初始值 
+            var oBox = document.getElementById('.page-show .main .slide img');
+            document.addEventListener('touchstart', function (ev) {
+                //手指点下 
+                var oldC = c;
+                //把初始值放到oldC里面 
+                function getC(ev) {
+                    var x1 = ev.targetTouches[0].pageX;
+                    var y1 = ev.targetTouches[0].pageY;
+                    //两根手指缩放肯定需要两根手指，【0】第一根手指的Xy的坐标 
+                    var x2 = ev.targetTouches[1].pageX;
+                    //第二根手指的坐标 
+                    var y2 = ev.targetTouches[1].pageY;
+                    var a = x1 - x2;
+                    //第一根手指的pageX-第二根手指的pageX，这样正好是一个之间三角形 得到两个直角边； 
+                    var b = y1 - y2;//同上 return Math.sqrt(a*a+b*b)//已知两个直角边开平方得出 斜角边 
+                } if (ev.targetTouches.length == 2) {
+                    //判断是否是两根手指 是的话 把两根手指点上去的时候的 斜脚边的初始值 放到 downC里面 
+                    var downC = getC(ev);
+                }
+                document.addEventListener('touchmove', function (ev) {
+                    //手指移动的时候 
+                    if (ev.tatgetTouches.length == 2) {
+                        //判断移动的时候是否是两根手指 
+                        c = getC(ev) / downC + oldC;
+                        //这个时候的getC(ev)是move时候的，用移动后的斜脚边的值除没移动的值加上他的初始值， 
+                        oBox.style.webkitTransform = 'scale(' + c + ')';
+                        //通过scale----2D缩放转换 
+                    }
+                }, false)
+            }, false)
+        }, false) 

@@ -1,0 +1,11 @@
+使用方法：
+
+1、引入jquery
+2、引入jquery.pseudo.js
+3、添加css，如p{before: "before ";}
+
+有任何问题请留言
+
+原文地址：http://www.devdo.net/ie-before-after.html
+
+【码农小兵】因为码农，世界变得更美好http://www.devdo.net

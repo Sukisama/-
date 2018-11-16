@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>18. circular trails</title>
+
+  <style>
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+
+</head>
+
+<body>
+
+
+  <script src='http://www.17sucai.com/preview/775073/2018-09-15/trails/js/p5.min.js'></script>
+  <script src='http://www.17sucai.com/preview/775073/2018-09-15/trails/js/p5.dom.js'></script>
+  <script src='http://www.17sucai.com/preview/775073/2018-09-15/trails/js/dat.gui.min.js'></script>
+
+  <script>
+  var gui = new dat.GUI();
+
+
+
+    var opacity = false;
+    var angle = 0;
+    var speed = 0.01;
+
+    var relativeSpeed = 1.6;
+
+    var innerCircles = 7;
+    var outerCircles = 5;
+    var radi = 220;
+
+
+    gui.add(window, 'opacity');
+    var rsC = gui.add(window, 'relativeSpeed', 0, 2.4, 0.4);
+
+    rsC.onChange(function () {
+      background(0);
+    });
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      noStroke();
+      // strokeWeight(2)
+      background(0);
+    }
+
+    function draw() {
+      var l0 = radi;
+      var l1 = 60;
+
+      background(0, opacity ? 255 : 10);
+
+      translate(width / 2, height / 2);
+      rotate(angle);
+
+      for (var i = 0; i < innerCircles; i++) {
+        fill(color('hsb(' + round(angle * 30 * i) % 360 + ',100%,100%)'));
+        push();
+        rotate(i * TWO_PI / innerCircles);
+        translate(0, l0);
+        ellipse(0, 0, 7);
+
+        rotate(angle * relativeSpeed);
+        for (var j = 0; j < outerCircles; j++) {
+          push();
+          fill(color('hsb(' + round(angle * 30 * (j + i)) % 360 + ',100%,100%)'));
+          rotate(j * TWO_PI / outerCircles);
+          translate(0, l1);
+          ellipse(0, 0, 7);
+
+          pop();
+        }
+
+        pop();
+      }
+      angle += speed;
+    }
+
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      background(0);
+    }
+
+
+    function mousePressed() {
+      background(0);
+      innerCircles = random(6, 10);
+      outerCircles = random(5, 10);
+
+      radi = map(innerCircles, 6, 10, 200, 280);
+    }
+    </script>
+
+
+</body>
+
+</html>

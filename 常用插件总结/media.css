@@ -1,0 +1,42 @@
+@charset "utf-8";
+/**
+ * media
+ */
+  @media screen and (min-width: 376px) and (max-width: 414px) { /*iPhone Plus*/
+    html { font-size: 69%; }
+  }
+  @media screen and (min-width: 415px) and (max-width: 480px) {
+    html { font-size: 80%; }
+  }
+  @media screen and (min-width: 481px) and (max-width: 540px) {
+    html { font-size: 90%; }
+  }
+  @media screen and (min-width: 541px) and (max-width: 640px) {
+    html { font-size: 106.5%; }
+  }
+  @media screen and (min-width: 641px) and (max-width: 720px) {
+    html { font-size: 120%; }
+  }
+  @media screen and (min-width: 721px) and (max-width: 768px) { /*iPad*/
+    html { font-size: 128%; }
+  }
+  @media screen and (min-width: 769px) and (max-width: 810px) {
+    html { font-size: 135%; }
+  }
+  @media screen and (min-width: 811px) and (max-width: 930px) {
+    html { font-size: 155%; }
+  }
+  @media screen and (min-width: 931px) and (max-width: 1024px) { /*iPad Pro*/
+    html { font-size: 170.5%; }
+  }
+  @media screen and (min-width: 1025px) and (max-width: 1080px) { /*一体机*/
+    html { font-size: 180%; }
+  }
+  @media screen and (min-width: 1081px) and (max-width: 1200px) {
+    html { font-size: 200%; }
+  }
+  @media screen and (min-width: 1201px) { /*PC*/
+    body,
+    .w { max-width: 640px !important; }
+  }
+  

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>移动端视频页内播放demo</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width">
+	<meta name="format-detection" content="telephone=no,address=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-touch-fullscreen" content="no">
+	<link rel="stylesheet" href="base.css">
+</head>
+<body class="maxw">
+	<div class="videobox">
+		<div id="j_play" class="videocover"></div>
+    </div>
+	
+<script src="jquery.min.js"></script>
+<script>
+	var w = $(window).width();
+	var video = document.createElement("video");
+	video.style.display = "block";
+	video.setAttribute("x5-playsinline", "");
+	video.setAttribute("playsinline", "");
+	video.setAttribute("webkit-playsinline", "");
+	video.setAttribute("preload", "");
+	video.setAttribute("width", w);
+	video.setAttribute("height", w*0.55);
+	video.setAttribute("src", "http://codeue.com/videos/test.mp4");
+	$(".videobox").append(video);
+	$("#j_play").on("click",function() {
+		video.style.opacity = "1";
+		video.play();
+		$("#j_play").fadeOut();
+	})
+    video.addEventListener("ended",function(){
+        $("#j_play").fadeIn();
+    },false);
+</script>
+</body>
+</html>

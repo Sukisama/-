@@ -1,0 +1,160 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>在最深的海洋里</title>
+
+  <style>
+    canvas,
+    body {
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      background: url('http://screen.cditv.cn:8080/Public/Statics/cpcca/images/page_bg1.jpg');
+    }
+
+    canvas {
+      position: absolute;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div></div>
+
+  <script>
+    var canvas = document.createElement('canvas');
+    document.getElementsByTagName('body')[0].appendChild(canvas);
+    var c = canvas.getContext('2d');
+
+    var numParticles = 40;
+
+    var bg = [255, 255, 255, 0];
+    var cols = ['#d8002c', '#7dfff2'];
+
+    setup();
+    window.addEventListener('resize', setup);
+
+    function setup() {
+      canvas.width =  window.innerWidth;
+      canvas.height =  window.innerHeight;
+      c.beginPath();
+      c.rect(0, 0, canvas.width, canvas.height);
+      c.fillStyle = `rgba(0,0,0,1)`;
+      c.fill();
+    }
+
+    var mouse = {
+      x: canvas.width / 2,
+      y: canvas.height / 2
+    }
+
+    setInterval(animate, 30);
+    function animate() {
+      fade();
+      draw();
+      // window.requestAnimationFrame(function(){animate()})
+    }
+
+    function fade() {
+      c.beginPath();
+      c.rect(0, 0, canvas.width, canvas.height);
+      c.fillStyle = `rgba(0,0,0,1)`;
+      c.fill();
+    }
+
+    function Particle() {
+      this.pos = {
+        x: Math.random() * canvas.width * 0.8 + canvas.width * 0.1,
+        y: Math.random() * canvas.height * 0.8 + canvas.height * 0.1
+      }
+      this.r = 1
+      this.speed = 6
+      this.radius = 3
+      this.step = Math.random() * 400
+      this.vx = Math.random() * this.speed / 4 - this.speed / 8
+      this.vy = Math.random() * this.speed / 4 - this.speed / 8
+      this.colIndex = Math.floor(Math.random() * cols.length)
+      this.history = []
+      this.update = function () {
+        //////////////////////////////////////
+        this.step++
+        this.step %= 400
+        if (this.history.length > 5) {
+          this.history.shift()
+        }
+        this.pos.x += this.vx
+        this.pos.y += this.vy
+        this.vx = this.vx * 0.98 + (Math.random() * this.speed * 2 - this.speed) * 0.12
+        this.vy = this.vy * 0.98 + (Math.random() * this.speed * 2 - this.speed) * 0.12
+
+        var dx = mouse.x - this.pos.x
+        var dy = mouse.y - this.pos.y
+        if (this.step > 365) {
+          this.vx = this.vx * 0.9 + dx * 0.004
+          this.vy = this.vy * 0.9 + dy * 0.004
+          this.vx = Math.min(this.vx, 4.0)
+          this.vx = Math.max(this.vx, -4.0)
+          this.vy = Math.min(this.vy, 4.0)
+          this.vy = Math.max(this.vy, -4.0)
+        }
+
+        if (this.step > 100 && this.step < 110) {
+          var d = dx * dx + dy * dy
+          if (d < (canvas.height / 8 * canvas.height / 8)) {
+            this.vx = this.vx * 0.9 - (mouse.x - this.pos.x) * 0.002
+            this.vy = this.vy * 0.9 - (mouse.y - this.pos.y) * 0.002
+          }
+
+        }
+
+        //////////////////////////////////////
+        if (this.history.length > 4) {
+          c.beginPath()
+          c.moveTo(this.pos.x, this.pos.y)
+          for (var i = this.history.length - 1; i >= 0; i--) {
+            c.lineTo(this.history[i].x, this.history[i].y)
+          }
+          c.fillStyle = cols[this.colIndex]
+          c.strokeStyle = cols[this.colIndex]
+          c.fill()
+          c.lineWidth = 6
+          c.arc(this.pos.x, this.pos.y, this.radius, 0, 2 * Math.PI);
+          c.lineJoin = "round"
+          c.stroke()
+
+        }
+
+        //////////////////////////////////////
+        if (this.pos.x > canvas.width || this.pos.x < 0 || this.pos.y > canvas.height || this.pos.y < 0) {
+          delete this.pos
+          delete this.history
+          return false;
+        }
+        this.history.push({
+          x: this.pos.x,
+          y: this.pos.y
+        })
+        return true;
+      }
+    }
+
+    var particles = [new Particle()]
+
+
+    function draw() {
+      if (particles.length < numParticles) {
+        particles.push(new Particle())
+      }
+
+      particles = particles.filter(function (p) {
+        return p.update()
+      })
+
+    }</script>
+
+</body>
+
+</html>

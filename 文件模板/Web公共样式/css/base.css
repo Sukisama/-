@@ -1,0 +1,83 @@
+@charset "utf-8";
+
+/* reset */
+*,*:before,*:after { -webkit-transition: .5s; transition: .5s; }
+body { min-width:1200px; font-size: 18px; font-family: "Microsoft Yahei", "\5b8b\4f53", Arial, Helvetica, sans-serif; line-height: 1.5; color: #333; }
+body,h1,h2,h3,h4,h5,h6,hr,p,blockquote,dl,dt,dd,ul,ol,li,pre,form,fieldset,legend,button,input,textarea,th,td { margin: 0; padding: 0; }
+input,select,button,textarea { font-size: 100%; font-family: inherit; outline: none; border: none; }
+ul,ol { list-style: none; }
+img { border: 0; }
+a { color: #333; text-decoration: none; }
+a:hover { color: #ea1515; text-decoration: underline; }
+a img{ vertical-align:top; }
+table { border-collapse: collapse; border-spacing: 0; }
+small,.small { font-size: 12px; }
+big,.big { font-size: 18px; }
+:focus { outline: 0; }
+
+/* common */
+/*width*/
+.w { width: 1200px; margin: 0 auto; }
+
+/*float*/
+.fl { float: left; }
+.fr { float: right; }
+
+/*text-align*/
+.tl { text-align: left; }
+.tc { text-align: center; }
+.tr { text-align: right; }
+.b { font-weight: bold;}
+
+/*position*/
+.po-r { position: relative; }
+.po-a { position: absolute }
+.po-f { position: fixed; }
+
+/*margin*/
+.mt20 { margin-top: 20px; }
+.mt25 { margin-top: 25px; }
+.mt30 { margin-top: 30px; }
+.mt40 { margin-top: 40px; }
+.mt50 { margin-top: 50px; }
+.mt55 { margin-top: 55px; }
+.mt60 { margin-top: 60px; }
+.mt70 { margin-top: 70px; }
+.mt80 { margin-top: 80px; }
+
+
+/*red*/
+.color-red,
+.color-red a { color: #ea1515; }
+a.color-red:hover,
+.color-red a:hover { text-decoration: underline; }
+
+/*clearfix*/
+.clearfix:after { clear: both; height: 0; display: block; content: ''; }
+.clearfix { zoom: 1; }
+.clear{clear:both; height:0; font-size:0; overflow:hidden;}
+
+/*hide*/
+.hide { display: none; }
+.hidden { overflow: hidden; }
+
+/*transition*/
+.trans-none,
+.trans-none ul { -webkit-transition: none; transition: none; }
+
+/*img-load*/
+.img-load .image,
+img.img-load,
+.img-load img { display: block; overflow: hidden; }
+.img-load .image,
+img.img-load,
+.img-load img { background-color: #f0f0f0; }
+
+/*img-zoom */
+.img-zoom .image:hover img { -webkit-transform: scale(1.2); transform: scale(1.2); }
+
+/*media*/
+@media screen and (max-width: 980px) {
+  body { min-width: 1200px; }
+  .main-body { min-height: 2000px; }
+}
