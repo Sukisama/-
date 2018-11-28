@@ -126,12 +126,12 @@
     <div class="inputBoxContainer" id="inputBoxContainer">
       <input type="text" class="realInput">
       <div class="bogusInput">
-        <input type="password" maxlength="6" disabled="">
-        <input type="password" maxlength="6" disabled="">
-        <input type="password" maxlength="6" disabled="">
-        <input type="password" maxlength="6" disabled="">
-        <input type="password" maxlength="6" disabled="">
-        <input type="password" maxlength="6" disabled="">
+        <input type="text" maxlength="6" disabled="">
+        <input type="text" maxlength="6" disabled="">
+        <input type="text" maxlength="6" disabled="">
+        <input type="text" maxlength="6" disabled="">
+        <input type="text" maxlength="6" disabled="">
+        <input type="text" maxlength="6" disabled="">
       </div>
     </div>
     <button id="confirmButton" class="confirmButton">查看</button>
@@ -161,8 +161,8 @@
           }
         },
         setValue: function () {
-          this.realInput.value = this.realInput.value.replace(/\D/g, "");
-          JSRunTrace(this.realInput.value.replace(/\D/g, ""))
+          this.realInput.value = this.realInput.value.replace(/\W/g, "");
+          JSRunTrace(this.realInput.value.replace(/\W/g, ""))
           var real_str = this.realInput.value;
           for (var i = 0; i < this.maxLength; i++) {
             this.bogusInputArr[i].value = real_str[i] ? real_str[i] : "";

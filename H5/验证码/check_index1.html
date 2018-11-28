@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>五粮液 ｜ 防伪查询</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="css/main.css" />
+</head>
+
+<body>
+<!--input start-->
+<div class="inbox cc">
+    <div class="inner por tc">
+        <div class="ccover"></div>
+        <div class="fl myInput myInput1 tc" id="J_Input1"></div>
+        <div class="fl myInput myInput2 tc" id="J_Input2"></div>
+        <div class="fl myInput myInput3 tc" id="J_Input3"></div>
+        <div class="fl myInput myInput4 tc" id="J_Input4"></div>
+        <input type="text" name="" class="initem" id="J_initem" value="" maxlength="4">
+    </div>
+    <div class="checkbtn tc" onclick="doCheck();">立即查询</div>
+</div>
+
+<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+//输入值监听
+$("#J_initem").bind('input propertychange', function() {  
+    var text = $(this).val().trim();
+    var len = $(this).val().trim().length;
+    if(len<1){
+        $("#J_Input1").html("").removeClass("on");
+        $("#J_Input2").html("").removeClass("on");
+        $("#J_Input3").html("").removeClass("on");
+        $("#J_Input4").html("").removeClass("on");
+    }else if(len==1){
+        $("#J_Input2").html("").removeClass("on");
+        $("#J_Input3").html("").removeClass("on");
+        $("#J_Input4").html("").removeClass("on");
+    }else if(len==2){
+        $("#J_Input3").html("").removeClass("on");
+        $("#J_Input4").html("").removeClass("on");
+    }else if(len==3){
+        $("#J_Input4").html("").removeClass("on");
+    }
+    if(text == ""){
+        $("#J_Input1").html("");
+        $("#J_Input2").html("");
+        $("#J_Input3").html("");
+        $("#J_Input4").html("");
+    }
+    for(var i=0;i<len;i++){
+        $("#J_Input"+(i+1)).html(text.substring(i,i+1));
+        $("#J_Input"+(i+1)).addClass("on");
+    }
+});  
+//输入值监听
+//touch事件，触发输入
+$(".ccover").on("click",function(){
+    $(".initem").focus();
+});
+//执行查询
+function doCheck(){
+    var num = $(".initem").val().trim();//该值为输入的结果
+    alert("来自方法doCheck();本方法仅供测试事件："+num);
+}
+</script>  
+
+</body>
+</html>
