@@ -1,0 +1,109 @@
+@charset "utf-8";
+
+body{
+    font-family: Helvetica,STHeiti STXihei,Microsoft JhengHei,Microsoft YaHei,Arial;
+}
+.fl{float:left;}.fr{float:right;}.clear{clear:both;}.hide{display:none;}.ofhidden{overflow:hidden;}
+input,button{ -webkit-appearance: none; border:none;background: none;-webkit-tap-highlight-color:rgba(255,255,255,0);}
+.img-w{ display: block; width: 100%;}
+.dib{ display: inline-block; }
+.db{ display: block; }
+.tc{ text-align: center; }
+.por{ position: relative; }
+.poa{ position: absolute; }
+
+.inbox{
+    padding: 10px;
+}
+.inbox .inner{
+    position: relative;
+    margin: 10px auto;
+    width: 256px;
+    overflow: hidden;
+}
+.inbox .tip{
+    padding: 0 50px;
+    color: #020202;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.inbox.cc { margin-top: 15%; }
+.inbox.cc .checkbtn{ margin-top: 40px; }
+.inbox.cc .tip{ text-align: center; }
+.ccover{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 3;
+    cursor: pointer;
+    -webkit-tap-highlight-color:rgba(255,0,0,0);
+}
+.inbox .myInput{
+    margin: 0 5px;
+    padding: 5px;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #dedbdb;
+    border-radius: 5px;
+    cursor: pointer;
+    overflow: hidden;
+    font-size: 0;
+    -webkit-text-size-adjust:none;
+    color: #d00e0e;
+}
+.inbox.cc .inner{
+    width: 204px;
+    border: 1px solid #c3c3c3;
+    border-radius: 5px;
+}
+.inbox.cc .myInput{
+    margin: 0;
+    padding: 5px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-right: 1px solid #c3c3c3;
+    border-radius: 0px;
+    cursor: pointer;
+    overflow: hidden;
+}
+.inbox.cc .myInput4{
+    border: none;
+}
+.inbox .myInput{ 
+  font-size: 38px;
+  width: 100%;
+  height: 100%;
+  line-height: 40px; 
+}
+.inbox .myInput.on{ border: 2px solid #d00e0e; }
+.inbox.cc .myInput.on{ border: none; border-right: 1px solid #c3c3c3;}
+.inbox.cc .myInput4.on{ border: none;}
+.inbox .initem{
+  position: absolute;
+  left: -200px;
+  top: 10px;
+  z-index: 1;
+  width: 10px;
+  height: 10px;
+  cursor: pointer;
+  max-width: 10em;
+  font-size: 10px;
+  color: #fff;
+  overflow: hidden;
+}
+
+.checkbtn{
+    width: 80%;
+    height: 1em;
+    line-height: 1;
+    font-size: 22px;
+    color: #fff;
+    background-color: #d00e0e;
+    margin: 10px auto;
+    padding: 12px 0;
+    border-radius: 5px;
+    cursor: pointer;
+}

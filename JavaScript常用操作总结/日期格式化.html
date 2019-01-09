@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>format</title>
+</head>
+
+<body>
+
+    <script src="https://cdn.bootcss.com/jquery/3.3.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            console.log(date2Millisecond("2018-07-09 14:13:11"));
+            console.log(date2Millisecond("2018-7-9 14:13:11"));
+            console.log(date2Millisecond("2018/07/09 14:13:11"));
+            console.log(date2Millisecond("2018/7/9 14:13:11"));
+            console.log(date2Millisecond("2018年7月9日 14时13分11秒"));
+            console.log(date2Millisecond("2018年7月9日 14:13:11"));
+            console.log(date2Millisecond("2018-07-09"));
+            console.log(date2Millisecond("2018/07/09"));
+            console.log(date2Millisecond("2018/7/9"));
+            console.log(date2Millisecond("2018年7月9日"));
+
+            console.log(millisecond2Date(1531116791000, 'YYYY年M月D日 hh时mm分ss秒'));
+            console.log(millisecond2Date(1531065600000, 'YYYY年M月D日 hh时mm分ss秒'));
+        });
+
+        function millisecond2Date(millisecond, format) {
+            if (millisecond != '') {
+                var date = new Date(parseInt(millisecond));
+                var map = {
+                    'M': date.getMonth() + 1, // 月份
+                    'D': date.getDate(), // 日
+                    'h': date.getHours(), // 小时
+                    'm': date.getMinutes(), // 分
+                    's': date.getSeconds(), // 秒
+                    'q': Math.floor((date.getMonth() + 3) / 3), // 季度
+                    'S': date.getMilliseconds() // 毫秒
+                };
+                format = format.replace(/([YMDhmsqS])+/g, function(all, t) {
+                    var v = map[t];
+                    if (v !== undefined) {
+                        if (all.length > 1) {
+                            v = '0' + v;
+                            v = v.substr(v.length - 2);
+                        }
+                        return v;
+                    } else if (t === 'Y') {
+                        return (date.getFullYear() + '').substr(4 - all.length);
+                    }
+                    return all;
+                });
+                return format;
+            } else {
+                return '';
+            }
+        }
+
+        function date2Millisecond(date) {
+
+            var millisecond = 0;
+
+            date = date.replace(new RegExp("年|月", "gm"), "/");
+            date = date.replace(new RegExp("时|分", "gm"), ":");
+            date = date.replace(new RegExp("日|秒", "gm"), "");
+            date = date.replace(new RegExp("-", "gm"), "/");
+
+            millisecond = new Date(date).getTime();
+
+            return millisecond;
+
+        }
+    </script>
+</body>
+
+</html>

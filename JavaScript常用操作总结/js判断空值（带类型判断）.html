@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>js判断空值的方法</title>
+</head>
+
+<body>
+    <script src="https://cdn.bootcss.com/jquery/2.2.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            document.write('======================== 为空值的情况 ==================<br/>');
+            document.write('isEmpty("")===', isEmpty("") + '<br/>');
+            document.write('isEmpty([])===', isEmpty([]) + '<br/>');
+            document.write('isEmpty({})===', isEmpty({}) + '<br/>');
+            document.write('isEmpty(0)===', isEmpty(0) + '<br/>');
+            document.write('isEmpty(NaN)===', isEmpty(NaN) + '<br/>');
+            document.write('isEmpty(null)===', isEmpty(null) + '<br/>');
+
+            document.write('======================== 非空的情况 ==================<br/>');
+            document.write('isEmpty("name")===', isEmpty("name") + '<br/>');
+            document.write('isEmpty(["aaa", "bbb", "ccc"])===', isEmpty(["aaa", "bbb", "ccc"]) + '<br/>');
+            document.write('isEmpty({name:"lll", age:111})===', isEmpty({
+                name: 'lll',
+                age: 111
+            }) + '<br/>');
+            document.write('isEmpty(222)===', isEmpty(222) + '<br/>');
+            document.write('isEmpty(0.001)===', isEmpty(0.001) + '<br/>');
+            document.write('isEmpty(Number(999))===', isEmpty(Number(999)) + '<br/>');
+        });
+
+        function isEmpty(param,type) {
+            console.log('typeof param---', typeof param);
+            if (type) {
+              if ((typeof param).toString() == 'object') {
+                var isArray = (Object.prototype.toString.call(param) === '[object Array]');
+                switch (type) {
+                  case 'array':
+                    console.log('(typeof param).toString() ---', (typeof param).toString());
+                    console.log('isarray ', isArray);
+                    return isArray;
+                  case 'object':
+                    if(isArray) {
+                      return false;
+                    }
+                    return true;
+                }
+              } else {
+                return ((typeof param).toString() == type);
+              }
+            } else {
+              switch (typeof param) {
+                case 'undefined':
+                    return true;
+                    break;
+                case 'string':
+                    if (param.replace(/(^[ \t\n\r]*)|([ \t\n\r]*$)/g, '').length == 0) {
+                        return true;
+                    }
+                    break;
+                case 'boolean':
+                    if (!param) {
+                        return true;
+                    }
+                    break;
+                case 'number':
+                    if (param === 0 || isNaN(param)) {
+                        return true;
+                    }
+                    break;
+                case 'object':
+                    if (JSON.stringify(param) == '[]' || JSON.stringify(param) == '{}' || JSON.stringify(param) == 'null') {
+                        return true;
+                    }
+                    break;
+                default:
+                    break;
+              }
+              return false;
+            }
+            
+        }
+    </script>
+</body>
+
+</html>
