@@ -1,0 +1,281 @@
+  <script type="text/javascript">
+
+    var myScroll;
+    var pullDownFlag, pullUpFlag;
+    var pullDown, pullUp;
+    var pageNo = 2; // 加载分页
+    var pageSize = 15; // 每页加载多少条
+    // var catid = {$catid};
+    var catid = '1254';
+    var list = $("#list");
+    // var urlApi = 'http://yuqing.open.cditv.cn/index.php?m=content&c=index&a=ls'
+    var urlApi = '/api/news.json'
+
+    $(function () {
+      getFirstPage();
+    });
+
+    function getFirstPage() {
+      var param = {
+        catid: catid
+      };
+      $.ajax({
+        url: urlApi,
+        type: 'GET',
+        data: param,
+        dataType: "json",
+        success: function (json) {
+          $("#wating_box").remove();
+          if (json.code == 0) {
+            var html = "";
+            if (json.data && json.data.length > 0) {
+              for (var i = 0; i < json.data.length; i++) {
+                var item = json.data[i];
+                html += '<li class="item">';
+                html += '<a class="J_item" href="' + item.url + '">';
+                html += '<div class="cont">' + item.title + '</div>';
+                html += '<div class="tag-box clearfix image">';
+                if (item.thumb) {
+                  html += '<div class="tag-pic fr"><img class="J_lazyImg" data-src="' + item.thumb + '" alt="' + item.title + '"></div>';
+                }
+                if (item.inputtime) {
+                  html += '<div class="tag tag-time">' + dateFormat(item.inputtime,'YYYY年MM月DD日') + '</div>';
+                }
+                if (item.copyfrom) {
+                  html += '<div class="tag tag-from">' + item.copyfrom + '</div>';
+                }
+                if (item.origin) {
+                  html += '<div class="tag tag-site">' + item.origin + '</div>';
+                }
+                if (item.keywords) {
+                  html += '<div class="tag tag-keyword">' + item.keywords + '</div>';
+                }
+                html += '</div>';
+                html += '</a>';
+                html += '</li>';
+              }
+            }
+            // 创建列表
+            list.html(html);
+            // 列表点击变色
+            changeColor('#list li a','#e9ebef');
+            loaded();
+            $(".J_lazyImg").lazyLoad();
+          } else {
+            tips(json.message);
+          }
+        },
+        beforeSend: function () {
+          var html = '<div id="wating_box" class="wating-box"><div class="waiting-inner"><div class="waiting">提交中...</div></div></div>';
+          $("body").append(html);
+        }
+      });
+    }
+
+
+    function loaded() {
+      pullDownFlag = 0;
+      pullUpFlag = 0;
+      pullDown = $("#pullDown");
+      pullUp = $("#pullUp");
+      $("#list").css({
+        'min-height': $(window).height()
+      });
+      myScroll = new IScroll("#wrapper", {
+        probeType: 3, //必须要有
+        // momentum: false,//关闭惯性滑动
+        click: true,//点击事件开启
+        mouseWheel: true,//鼠标滑轮开启
+        scrollbars: true,//滚动条可见
+        fadeScrollbars: true,//滚动条渐隐
+        interactiveScrollbars: true,//滚动条可拖动
+        shrinkScrollbars: 'scale', // 当滚动边界之外的滚动条是由少量的收缩
+        useTransform: true,//CSS转化
+        useTransition: true,//CSS过渡
+        bounce: true,//反弹
+        freeScroll: false,//只能在一个方向上滑动
+        startX: 0,
+        startY: 0,
+        // snap: "li",//以 li 为单位
+      });
+      myScroll.on('scroll', positionJudge);
+      myScroll.on("scrollEnd", action);
+    }
+    function positionJudge() {
+      var maxScrollY = $("#scroller").height();
+      if ((this.y < this.maxScrollY) && (this.pointY < 1)) {
+        this.scrollTo(0, maxScrollY, 0);
+        return;
+      } else {
+        if (this.y > 0) {
+          if (this.y > 50) {    //判断下拉
+            pullDown.html("<span class='Loading'>松手开始刷新</span>");
+            pullDownFlag = 1;
+          } else if (this.y < 50) {
+            pullDown.html("<span>下拉刷新…</span>");
+          }
+        } else {
+          if (this.maxScrollY - this.y >= 50) {   //判断上拉
+            pullUp.html("<span class='Loading'>加载中...</span>");
+            pullUpFlag = 1;
+          } else if (this.maxScrollY - this.y < 50) {
+            pullUp.html("<span>上拉加载…</span>");
+          }
+        }
+      }
+    }
+    function action() {
+      if (pullDownFlag == 1) {
+        pullDown.html("<span>下拉刷新…</span>");
+        pullDownFlag = 0;
+        pullDownAction();
+      } else if (pullUpFlag == 1) {
+        pullUp.html("<span>上拉加载…</span>");
+        pullUpFlag = 0;
+        pullUpAction();
+      }
+      myScroll.refresh();
+      $('.J_lazyImg').lazyLoad();
+      var scroll = Math.abs(parseInt($('#scroller').css('transform').split(',')[5]));
+      if (scroll > 400) {
+        $("#scrollUp").show(600);
+      } else {
+        $("#scrollUp").hide(600);
+      }
+    }
+
+    //下拉刷新执行方法
+    function pullDownAction() {
+      var param = {
+        catid: catid
+      };
+      $.ajax({
+        url: urlApi,
+        type: 'GET',
+        data: param,
+        dataType: "json",
+        success: function (json) {
+          if (json.code == 0) {
+            var html = "";
+            if (json.data && json.data.length > 0) {
+              for (var i = 0; i < json.data.length; i++) {
+                var item = json.data[i];
+                html += '<li class="item">';
+                html += '<a class="J_item" href="' + item.url + '">';
+                html += '<div class="cont">' + item.title + '</div>';
+                html += '<div class="tag-box clearfix image">';
+                if (item.thumb) {
+                  html += '<div class="tag-pic fr"><img class="J_lazyImg" data-src="' + item.thumb + '" alt="' + item.title + '"></div>';
+                }
+                if (item.inputtime) {
+                  html += '<div class="tag tag-time">' + dateFormat(item.inputtime,'YYYY年MM月DD日') + '</div>';
+                }
+                if (item.copyfrom) {
+                  html += '<div class="tag tag-from">' + item.copyfrom + '</div>';
+                }
+                if (item.origin) {
+                  html += '<div class="tag tag-site">' + item.origin + '</div>';
+                }
+                if (item.keywords) {
+                  html += '<div class="tag tag-keyword">' + item.keywords + '</div>';
+                }
+                html += '</div>';
+                html += '</a>';
+                html += '</li>';
+              }
+            }
+            // 创建列表
+            list.html(html);
+            $(".J_lazyImg").lazyLoad();
+            myScroll.refresh();
+          } else {
+            tips(json.message);
+          }
+        }
+      });
+    }
+
+    //上拉加载执行方法
+    function pullUpAction() {
+      var param = {
+        page: pageNo,
+        pagesize: pageSize,
+        catid: catid
+      };
+      $.ajax({
+        url: urlApi,
+        type: 'GET',
+        data: param,
+        dataType: "json",
+        success: function (json) {
+          if (json.code == 0) {
+            if (json.data && json.data.length > 0) {
+              var html = "";
+              for (var i = 0; i < json.data.length; i++) {
+                var item = json.data[i];
+                html += '<li class="item">';
+                html += '<a class="J_item" href="' + item.url + '">';
+                html += '<div class="cont">' + item.title + '</div>';
+                html += '<div class="tag-box clearfix image">';
+                if (item.thumb) {
+                  html += '<div class="tag-pic fr"><img class="J_lazyImg" data-src="' + item.thumb + '" alt="' + item.title + '"></div>';
+                }
+                if (item.inputtime) {
+                  html += '<div class="tag tag-time">' + dateFormat(item.inputtime,'YYYY年MM月DD日') + '</div>';
+                }
+                if (item.copyfrom) {
+                  html += '<div class="tag tag-from">' + item.copyfrom + '</div>';
+                }
+                if (item.origin) {
+                  html += '<div class="tag tag-site">' + item.origin + '</div>';
+                }
+                if (item.keywords) {
+                  html += '<div class="tag tag-keyword">' + item.keywords + '</div>';
+                }
+                html += '</div>';
+                html += '</a>';
+                html += '</li>';
+              }
+
+              // 创建列表
+              list.append(html);
+              $(".J_lazyImg").lazyLoad();
+              myScroll.refresh();
+              pageNo++;
+            } else {
+              var html = '<div class="pull no-more" style="text-align: center;"><span>没有更多了</span></div>';
+              if ($(".no-more")) {
+                $(".no-more").remove();
+              }
+              list.after(html);
+              myScroll.refresh();
+              myScroll.scrollTo(0, myScroll.maxScrollY, 700);
+              noMoreFlag = true;
+            }
+            
+          } else {
+            tips(json.message);
+          }
+        }
+      });
+    }
+
+    //阻止冒泡
+    document.addEventListener('touchmove', function (e) {
+      // 判断默认行为是否可以被禁用
+      if (e.cancelable) {
+        // 判断默认行为是否已经被禁用
+        if (!e.defaultPrevented) {
+          e.preventDefault();
+        }
+      }
+      // e.preventDefault();
+    }, false);
+
+    //返回顶部
+    $("#scrollUp").click(function () {
+      $("#scrollUp").hide(600);
+      myScroll.scrollTo(0, 0, 700);
+      return false;
+    });
+  </script>

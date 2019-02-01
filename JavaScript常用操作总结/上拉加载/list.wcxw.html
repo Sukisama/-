@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width">
+    <meta name="format-detection" content="telephone=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!-- 取消微信下的缓存 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- 样式重置 -->
+    <link rel="stylesheet" href="/statics/wechat/css/reset.css?v=20171103175108">
+    <script type="text/javascript" src="/statics/wechat/js/jquery-2.2.1.min.js?v=20171103175108"></script>
+    <script type="text/javascript" src="/statics/wechat/js/common.js?v=20171103175108"></script>
+    <title>文化新闻</title>
+    <meta name="description" content="旺苍新闻">
+    <link rel="stylesheet" href="/statics/wechat/css/list.css">
+    <script type="text/javascript" src="/statics/wechat/js/iscroll-probe.js"></script>
+</head>
+
+<body>
+    <div id="header">
+        <div class="header-inner">
+            <h1 class="title">文化新闻</h1>
+            <p class="desc">呈现旺苍县内、外重要文化新闻</p>
+        </div>
+    </div>
+    <div id="wrapper" class="top80">
+        <div id="scroller">
+            <div id="pullDown">
+                <span>下拉刷新…</span>
+            </div>
+            <ul id="list" class="img-list"></ul>
+            <div id="pullUp">
+                <span>上拉加载更多…</span>
+            </div>
+        </div>
+    </div>
+    <div class="po-r">
+        <div id="scrollUp"><a href="javascript:">top</a></div>
+    </div>
+    <script type="text/javascript">
+
+        var myScroll;
+        var pullDownFlag, pullUpFlag;
+        var pullDown, pullUp;
+        var up_page = 2; // 加载分页
+        var pageSize = 15; // 每页加载多少条
+        var THETYPE = "2";
+        var list = $("#list");
+
+        var userid = "";
+        var username = "";
+        var headurl = "";
+
+        $(function () {
+            userid = getUrlParam("userid");
+            username = getUrlParam("username");
+            headurl = getUrlParam("headurl");
+
+            THETYPE = getUrlParam("type");
+            console.log(THETYPE);
+
+            if (THETYPE == "1") {
+                document.title = "舆情预警";
+                $(".header-inner .title").html("舆情预警");
+                $(".header-inner .desc").html("展示舆情预警");
+            }
+
+
+            getFirstPage();
+        });
+
+        function getFirstPage() {
+            var param = {
+                type: THETYPE
+            };
+            $.ajax({
+                url: "/index.php?m=content&c=index&a=ls",
+                type: 'GET',
+                data: param,
+                dataType: "json",
+                success: function (json) {
+                    $("#wating_box").remove();
+                    if (json.code == 0) {
+                        var html = "";
+                        if (json.data.list && json.data.list.length > 0) {
+                            for (var i = 0; i < json.data.list.length; i++) {
+                                var item = json.data.list[i];
+                                var url = "/wechat/detail.php?id=" + item.id + "&userid=" + userid + "&username=" + username + "&headurl=" + headurl;
+                                html += '<li class="line-b">';
+                                html += '<a class="clearfix" href="' + url + '">';
+                                if (item.thumb) {
+                                    html += '<div class="image"><img src="' + item.thumb + '"></div>';
+                                }
+                                html += '<div class="text">';
+                                html += '<div class="title">' + item.title + '</div>';
+                                html += '<div class="date no-icon">' + item.create_time + '</div>';
+                                html += '</div>';
+                                html += '</a>';
+                                html += '</li>';
+                            }
+                        }
+                        // 创建列表
+                        list.html(html);
+                        // 列表点击变色
+                        changeColor('#list li', '#e9ebef');
+                        loaded();
+                    } else {
+                        tips(json.message);
+                    }
+                },
+                beforeSend: function () {
+                    var html = '<div id="wating_box" class="wating-box"><div class="waiting-inner"><div class="waiting">提交中...</div></div></div>';
+                    $("body").append(html);
+                }
+            });
+        }
+
+
+        function loaded() {
+            pullDownFlag = 0;
+            pullUpFlag = 0;
+            pullDown = $("#pullDown");
+            pullUp = $("#pullUp");
+            $("#list").css({
+                'min-height': $(window).height()
+            });
+            myScroll = new IScroll("#wrapper", {
+                probeType: 3, //必须要有
+                // momentum: false,//关闭惯性滑动
+                click: true,//点击事件开启
+                mouseWheel: true,//鼠标滑轮开启
+                scrollbars: true,//滚动条可见
+                fadeScrollbars: true,//滚动条渐隐
+                interactiveScrollbars: true,//滚动条可拖动
+                shrinkScrollbars: 'scale', // 当滚动边界之外的滚动条是由少量的收缩
+                useTransform: true,//CSS转化
+                useTransition: true,//CSS过渡
+                bounce: true,//反弹
+                freeScroll: false,//只能在一个方向上滑动
+                startX: 0,
+                startY: 0,
+                // snap: "li",//以 li 为单位
+            });
+            myScroll.on('scroll', positionJudge);
+            myScroll.on("scrollEnd", action);
+        }
+        function positionJudge() {
+            var maxScrollY = $("#scroller").height();
+            if ((this.y < this.maxScrollY) && (this.pointY < 1)) {
+                this.scrollTo(0, maxScrollY, 0);
+                return;
+            } else {
+                if (this.y > 0) {
+                    if (this.y > 50) {    //判断下拉
+                        pullDown.html("<span class='Loading'>松手开始刷新</span>");
+                        pullDownFlag = 1;
+                    } else if (this.y < 50) {
+                        pullDown.html("<span>下拉刷新…</span>");
+                    }
+                } else {
+                    if (this.maxScrollY - this.y >= 50) {   //判断上拉
+                        pullUp.html("<span class='Loading'>加载中...</span>");
+                        pullUpFlag = 1;
+                    } else if (this.maxScrollY - this.y < 50) {
+                        pullUp.html("<span>上拉加载…</span>");
+                    }
+                }
+            }
+        }
+        function action() {
+            if (pullDownFlag == 1) {
+                pullDown.html("<span>下拉刷新…</span>");
+                pullDownFlag = 0;
+                pullDownAction();
+            } else if (pullUpFlag == 1) {
+                pullUp.html("<span>上拉加载…</span>");
+                pullUpFlag = 0;
+                pullUpAction();
+            }
+            myScroll.refresh();
+            var scroll = Math.abs(parseInt($('#scroller').css('transform').split(',')[5]));
+            if (scroll > 400) {
+                $("#scrollUp").show(600);
+            } else {
+                $("#scrollUp").hide(600);
+            }
+        }
+
+        //下拉刷新执行方法
+        function pullDownAction() {
+            var param = {
+                catid: THETYPE
+            };
+            $.ajax({
+                url: "/index.php?m=content&c=index&a=ls",
+                type: 'GET',
+                data: param,
+                dataType: "json",
+                success: function (json) {
+                    if (json.code == 0) {
+                        var html = "";
+                        if (json.data.list && json.data.list.length > 0) {
+                            for (var i = 0; i < json.data.list.length; i++) {
+                                var item = json.data.list[i];
+                                var url = "/wechat/detail.php?id=" + item.id + "&userid=" + userid + "&username=" + username + "&headurl=" + headurl;
+                                html += '<li class="line-b">';
+                                html += '<a class="clearfix" href="' + url + '">';
+                                if (item.thumb) {
+                                    html += '<div class="image"><img src="' + item.thumb + '"></div>';
+                                }
+                                html += '<div class="text">';
+                                html += '<div class="title">' + item.title + '</div>';
+                                html += '<div class="date no-icon">' + item.create_time + '</div>';
+                                html += '</div>';
+                                html += '</a>';
+                                html += '</li>';
+                            }
+                        }
+                        // 创建列表
+                        list.html(html);
+                        myScroll.refresh();
+                    } else {
+                        tips(json.message);
+                    }
+                }
+            });
+        }
+
+        //上拉加载执行方法
+        function pullUpAction() {
+            var param = {
+                page: up_page,
+                pagesize: pageSize,
+                type: THETYPE
+            };
+            $.ajax({
+                url: "/index.php?m=content&c=index&a=ls",
+                type: 'GET',
+                data: param,
+                dataType: "json",
+                success: function (json) {
+                    if (json.code == 0) {
+                        if (json.data.list && json.data.list.length > 0) {
+                            var html = "";
+                            for (var i = 0; i < json.data.list.length; i++) {
+                                var item = json.data.list[i];
+                                var url = "/wechat/detail.php?id=" + item.id + "&userid=" + userid + "&username=" + username + "&headurl=" + headurl;
+                                html += '<li class="line-b">';
+                                html += '<a class="clearfix" href="' + url + '">';
+                                if (item.thumb) {
+                                    html += '<div class="image"><img src="' + item.thumb + '"></div>';
+                                }
+                                html += '<div class="text">';
+                                html += '<div class="title">' + item.title + '</div>';
+                                html += '<div class="date no-icon">' + item.create_time + '</div>';
+                                html += '</div>';
+                                html += '</a>';
+                                html += '</li>';
+                            }
+
+                            // 创建列表
+                            list.append(html);
+                            myScroll.refresh();
+                            up_page++;
+                        } else {
+                            var html = '<div class="pull no-more" style="text-align: center;"><span>没有更多了</span></div>';
+                            if ($(".no-more")) {
+                                $(".no-more").remove();
+                            }
+                            list.after(html);
+                            myScroll.refresh();
+                            myScroll.scrollTo(0, myScroll.maxScrollY, 700);
+                            noMoreFlag = true;
+                        }
+                    } else {
+                        tips(json.message);
+                    }
+                }
+            });
+        }
+
+        //阻止冒泡
+        document.addEventListener('touchmove', function (e) {
+            e.preventDefault();
+        }, false);
+
+        //返回顶部
+        $("#scrollUp").click(function () {
+            $("#scrollUp").hide(600);
+            myScroll.scrollTo(0, 0, 700);
+            return false;
+        });
+
+    </script>
+
+    <!-- 微信分享 begin -->
+    <!-- <script>
+        $.get("http://app.wangcang.cditv.cn/index.php?m=wechat&c=jssdk&a=getSignPackage&url=" + window.location.href, function (json) {
+            json = eval('(' + json + ')');
+
+            var appid = json.data.appId;
+            var timestamp = json.data.timestamp;
+            var str = json.data.nonceStr;
+            var sig = json.data.signature;
+
+            wx.config({
+                debug: false,
+                appId: appid,
+                timestamp: timestamp,
+                nonceStr: str,
+                signature: sig,
+                jsApiList: [
+                    // 所有要调用的 API 都要加到这个列表中
+                    'getNetworkType',
+                    'onMenuShareTimeline',
+                    'onMenuShareAppMessage'
+                ]
+            });
+
+            var img = $(".image").find('img');
+            var imgPath = img[0]['currentSrc'];
+
+            wx.ready(function () {
+                wx.onMenuShareTimeline({
+                    title: '文化旺苍微信-文化要闻', // 分享标题
+                    link: window.location.href, //分享链接
+                    imgUrl: imgPath,  // 分享图标
+                    success: function () {
+                        // 用户确认分享后执行的回调函数
+                    },
+                    cancel: function () {
+                        // 用户取消分享后执行的回调函数
+                    }
+                });
+
+                wx.onMenuShareAppMessage({
+                    title: '文化旺苍微信-文化要闻', // 分享标题
+                    desc: '主要展示旺苍县文化新闻', // 分享描述
+                    link: window.location.href, //分享链接
+                    imgUrl: imgPath,  // 分享图标
+                    type: '', // 分享类型,music、video或link，不填默认为link
+                    dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                    success: function () {
+                        // 用户确认分享后执行的回调函数
+                    },
+                    cancel: function () {
+                        // 用户取消分享后执行的回调函数
+                    }
+                });
+            });
+        });
+    </script> -->
+    <!-- 微信分享 end -->
+
+    <!-- 统计 -->
+    <script src="http://wa.data.cditv.tv/mda_api.js?1030"></script>
+    <script>
+        MDA_API.setUserEvent({
+            action: "pageview"
+        });
+    </script>
+    <!-- 百度统计 -->
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?fe7ee58fea6f53c0d8c4b2a460666b09";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js?v=20171103175108"></script>
+</body>
+
+</html>
